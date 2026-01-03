@@ -29,10 +29,8 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler"
-Documentation = "https://www.youtube.com/@AInVFX"
-"Bug Tracker" = "https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler/issues"
-Forum = "https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler/discussions"
+Repository = "https://github.com/mattmarkwick/SeedVR2ImgUpscale"
+"Bug Tracker" = "https://github.com/mattmarkwick/SeedVR2ImgUpscale/issues"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
