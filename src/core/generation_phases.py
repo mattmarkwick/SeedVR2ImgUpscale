@@ -12,7 +12,7 @@ for all batches before moving to the next phase, significantly improving
 performance especially when using model offloading.
 
 Key Features:
-- Four-phase pipeline (encode-all → upscale-all → decode-all → postprocess-all) for efficiency
+- Four-phase pipeline (encode-all -> upscale-all -> decode-all -> postprocess-all) for efficiency
 - Native FP8 pipeline support for 2x speedup and 50% VRAM reduction
 - Temporal overlap support for smooth transitions between batches
 - Adaptive dtype detection and configuration
@@ -96,7 +96,7 @@ def _prepare_video_batch(
         if log_info and debug:
             current_frames = end_idx - start_idx
             debug.log(f"Sequence of {current_frames} frames", category="video", force=True, indent_level=1)
-            debug.log(f"Padding batch: {uniform_padding} frame{'s' if uniform_padding != 1 else ''} added ({current_frames} → {current_frames + uniform_padding}) for uniform batches", 
+            debug.log(f"Padding batch: {uniform_padding} frame{'s' if uniform_padding != 1 else ''} added ({current_frames} -> {current_frames + uniform_padding}) for uniform batches", 
                      category="video", force=True, indent_level=1)
         video = pad_video_temporal(video, count=uniform_padding, temporal_dim=0, prepend=False, debug=None)
     
@@ -398,7 +398,7 @@ def encode_all_batches(
             if t % 4 != 1:
                 target = ((t-1)//4+1)*4+1
                 padding_frames = target - t
-                debug.log(f"Padding batch: {padding_frames} frame{'s' if padding_frames != 1 else ''} added ({t} → {target}) to meet 4n+1 constraint", 
+                debug.log(f"Padding batch: {padding_frames} frame{'s' if padding_frames != 1 else ''} added ({t} -> {target}) to meet 4n+1 constraint", 
                          category="video", force=True, indent_level=1)
                 # Apply 4n+1 padding to match exact frame count from encoding
                 video = _apply_4n1_padding(video)
@@ -510,7 +510,7 @@ def encode_all_batches(
                     tensor_name=f"latent_{encode_idx+1}",
                     dtype=ctx['compute_dtype'],
                     debug=debug,
-                    reason="VAE dtype → compute dtype",
+                    reason="VAE dtype -> compute dtype",
                     indent_level=1
                 )
             
@@ -952,7 +952,7 @@ def decode_all_batches(
             # Trim temporal padding: sample is in [T, C, H, W] format after rearrange
             if ori_length < sample.shape[0]:
                 padding_removed = sample.shape[0] - ori_length
-                debug.log(f"Trimming temporal padding: {padding_removed} frames removed ({sample.shape[0]} → {ori_length})", 
+                debug.log(f"Trimming temporal padding: {padding_removed} frames removed ({sample.shape[0]} -> {ori_length})", 
                          category="video", indent_level=1)
                 sample = sample[:ori_length]
                 total_padding_removed += padding_removed
@@ -960,13 +960,13 @@ def decode_all_batches(
             # Trim spatial padding to true target dimensions
             current_h, current_w = sample.shape[-2:]
             if current_h != true_h or current_w != true_w:
-                debug.log(f"Trimming spatial padding: {current_w}x{current_h} → {true_w}x{true_h}", 
+                debug.log(f"Trimming spatial padding: {current_w}x{current_h} -> {true_w}x{true_h}", 
                          category="video", indent_level=1)
                 sample = sample[:, :, :true_h, :true_w]
             
-            # Convert to output format: [T, C, H, W] → [T, H, W, C]
+            # Convert to output format: [T, C, H, W] -> [T, H, W, C]
             # Note: We keep values in [-1, 1] range - normalization happens in Phase 4
-            sample = optimized_sample_to_image_format(sample)  # T, C, H, W → T, H, W, C
+            sample = optimized_sample_to_image_format(sample)  # T, C, H, W -> T, H, W, C
             
             # Calculate write position with temporal overlap handling
             batch_frames = sample.shape[0]
@@ -1166,7 +1166,7 @@ def postprocess_all_batches(
                 # Get RGB slice from final_video for alpha processing
                 # final_video is [T, H, W, C], process_alpha_for_batch expects list of [T, C, H, W]
                 rgb_slice = ctx['final_video'][write_start:write_end, :, :, :3]  # Only RGB
-                rgb_tchw = rgb_slice.permute(0, 3, 1, 2)  # [T, H, W, 3] → [T, 3, H, W]
+                rgb_tchw = rgb_slice.permute(0, 3, 1, 2)  # [T, H, W, 3] -> [T, 3, H, W]
                 
                 # Process Alpha and merge with RGB
                 processed_samples = process_alpha_for_batch(
@@ -1182,7 +1182,7 @@ def postprocess_all_batches(
                 # Extract only the alpha channel and write to final_video's alpha slot
                 processed_rgba = processed_samples[0]  # [T, 4, H, W]
                 alpha_channel = processed_rgba[:, 3:4, :, :]  # [T, 1, H, W]
-                alpha_thwc = alpha_channel.permute(0, 2, 3, 1)  # [T, 1, H, W] → [T, H, W, 1]
+                alpha_thwc = alpha_channel.permute(0, 2, 3, 1)  # [T, 1, H, W] -> [T, H, W, 1]
                 
                 alpha_thwc = manage_tensor(
                     tensor=alpha_thwc,
@@ -1231,9 +1231,9 @@ def postprocess_all_batches(
             # Alpha was already written during alpha processing above
             if ctx.get('is_rgba', False) and sample_thwc.shape[-1] == 4:
                 sample_thwc_rgb = sample_thwc[..., :3]  # [T, H, W, 3]
-                sample = sample_thwc_rgb.permute(0, 3, 1, 2)  # [T, H, W, 3] → [T, 3, H, W]
+                sample = sample_thwc_rgb.permute(0, 3, 1, 2)  # [T, H, W, 3] -> [T, 3, H, W]
             else:
-                sample = sample_thwc.permute(0, 3, 1, 2)  # [T, H, W, C] → [T, C, H, W]
+                sample = sample_thwc.permute(0, 3, 1, 2)  # [T, H, W, C] -> [T, C, H, W]
             
             # Move to VAE device for processing
             sample = manage_tensor(
@@ -1329,7 +1329,7 @@ def postprocess_all_batches(
             else:
                 debug.log("Color correction disabled (set to none)", category="video", indent_level=1)
             
-            # Convert to final format: [T, C, H, W] → [T, H, W, C]
+            # Convert to final format: [T, C, H, W] -> [T, H, W, C]
             sample = optimized_sample_to_image_format(sample)
             
             # Apply normalization only to RGB channels, preserve Alpha as-is

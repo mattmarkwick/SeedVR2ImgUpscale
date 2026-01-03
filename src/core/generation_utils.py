@@ -266,14 +266,14 @@ def log_generation_start(info: Dict[str, Any], debug: Optional['Debug'] = None) 
         if info['true_h'] == info['padded_h'] and info['true_w'] == info['padded_w']:
             debug.log(
                 f"Input: {info['input_frames']} {frame_text}, "
-                f"{info['input_w']}x{info['input_h']}px → Output: {info['true_w']}x{info['true_h']}px "
+                f"{info['input_w']}x{info['input_h']}px -> Output: {info['true_w']}x{info['true_h']}px "
                 f"({res_constraint})",
                 category="generation", force=True, indent_level=1
             )
         else:
             debug.log(
                 f"Input: {info['input_frames']} {frame_text}, "
-                f"{info['input_w']}x{info['input_h']}px → Padded: {info['padded_w']}x{info['padded_h']}px → "
+                f"{info['input_w']}x{info['input_h']}px -> Padded: {info['padded_w']}x{info['padded_h']}px -> "
                 f"Output: {info['true_w']}x{info['true_h']}px ({res_constraint})",
                 category="generation", force=True, indent_level=1
             )
@@ -361,14 +361,9 @@ def setup_generation_context(
     # CLI multi-GPU uses CUDA_VISIBLE_DEVICES to restrict visibility per worker
     os.environ.setdefault("LOCAL_RANK", "0")
     
-    # Detect ComfyUI integration for interrupt support
-    try:
-        import comfy.model_management
-        interrupt_fn = comfy.model_management.throw_exception_if_processing_interrupted
-        comfyui_available = True
-    except:
-        interrupt_fn = None
-        comfyui_available = False
+    # Standalone mode - ComfyUI integration removed
+    interrupt_fn = None
+    comfyui_available = False
     
     # Create generation context
     ctx = {
@@ -585,7 +580,7 @@ def calculate_optimal_batch_params(total_frames: int, batch_size: int,
     # Find all valid 4n+1 batch sizes up to total_frames
     valid_sizes = [i for i in range(1, total_frames + 1) if i % 4 == 1]
     
-    # Best batch: largest valid size ≤ total_frames (maximizes temporal stability)
+    # Best batch: largest valid size <= total_frames (maximizes temporal stability)
     best_batch = max(valid_sizes) if valid_sizes else 1
     
     return {

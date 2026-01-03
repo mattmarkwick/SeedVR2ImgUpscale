@@ -323,12 +323,12 @@ def _configure_io_components(
                 _wrap_io_forward(module, name, model, debug)
                 io_components_offloaded.append(name)
                 io_memory_mb += module_memory
-                debug.log(f"{name} → {str(offload_device).upper()} ({module_memory:.2f}MB, dynamic swapping)", category="blockswap", indent_level=1)
+                debug.log(f"{name} -> {str(offload_device).upper()} ({module_memory:.2f}MB, dynamic swapping)", category="blockswap", indent_level=1)
             else:
                 module.to(device)
                 io_components_on_gpu.append(name)
                 io_gpu_memory_mb += module_memory
-                debug.log(f"{name} → {str(device).upper()} ({module_memory:.2f}MB)", category="blockswap", indent_level=1)
+                debug.log(f"{name} -> {str(device).upper()} ({module_memory:.2f}MB)", category="blockswap", indent_level=1)
 
     return {
         'components': io_components_offloaded,

@@ -52,7 +52,7 @@ class CustomLayerNorm(nn.Module):
             init.zeros_(self.bias)
 
     def forward(self, input):
-        # 🚀 FP8 COMPATIBILITY: Convert parameters to match input dtype
+        # FP8 COMPATIBILITY: Convert parameters to match input dtype
         # This prevents "Promotion for Float8 Types is not supported" errors
         weight = self.weight
         bias = self.bias

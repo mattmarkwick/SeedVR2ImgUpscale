@@ -533,7 +533,7 @@ def hsv_saturation_histogram_match(content_feat: Tensor, style_feat: Tensor, deb
     
     Algorithm:
     1. Convert both images to HSV color space
-    2. Divide hue circle into 12 bins (30° each)
+    2. Divide hue circle into 12 bins (30 degrees each)
     3. For each hue bin, match saturation histograms independently
     4. Reconstruct HSV with matched saturation
     5. Convert back to RGB
@@ -704,7 +704,7 @@ def _hue_conditional_saturation_match(
     """
     Match saturation histogram conditionally per hue bin.
     
-    Divides hue circle into 12 bins (30° each) and matches saturation
+    Divides hue circle into 12 bins (30 degrees each) and matches saturation
     separately for each bin to handle color-specific oversaturation.
     """
     num_bins = 12
@@ -718,7 +718,7 @@ def _hue_conditional_saturation_match(
         bin_start = bin_idx * bin_width
         bin_end = (bin_idx + 1) * bin_width
         
-        # Handle hue wrap-around for red (0°/360°)
+        # Handle hue wrap-around for red (0/360 degrees)
         if bin_idx == 0:
             content_mask = ((content_h >= 0) & (content_h < bin_end)) | (content_h >= (1.0 - bin_width))
             style_mask = ((style_h >= 0) & (style_h < bin_end)) | (style_h >= (1.0 - bin_width))

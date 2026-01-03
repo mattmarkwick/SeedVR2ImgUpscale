@@ -53,34 +53,34 @@ class Debug:
     - Force parameters for critical logs
     """
     
-    # Icon mapping for different categories
+    # Prefix mapping for different categories
     CATEGORY_ICONS = {
-        "general": "🔄",      # General operations/processing
-        "timing": "⚡",        # Performance timing
-        "memory": "📊",       # Memory usage tracking
-        "cache": "💾",        # Cache operations
-        "cleanup": "🧹",      # Cleanup operations
-        "setup": "🔧",        # Configuration/setup
-        "generation": "🎬",   # Generation process
-        "dit": "🚀",          # Model loading/operations
-        "blockswap": "🔀",    # BlockSwap operations
-        "download": "📥",     # Download operations
-        "success": "✅",      # Successful completion
-        "warning": "⚠️",      # Warnings
-        "error": "❌",        # Errors
-        "info": "ℹ️",         # Statistics/info
-        "tip" :"💡",          # Tip/suggestion
-        "video": "📹",        # Video/sequence info
-        "reuse": "♻️",        # Reusing/recycling
-        "runner": "🏃",       # Runner operations
-        "vae": "🎨",          # VAE operations\
-        "precision": "🎯",    # Precision
-        "device": "🖥️",       # Device info
-        "file": "📂",         # File operations
-        "alpha": "👻",        # Alpha operations
-        "starlove": "⭐💝",   # Star + love
-        "dialogue": "💬",     # Dialogue
-        "none" : "",
+        "general": "[GEN]",      # General operations/processing
+        "timing": "[TIME]",      # Performance timing
+        "memory": "[MEM]",       # Memory usage tracking
+        "cache": "[CACHE]",      # Cache operations
+        "cleanup": "[CLEAN]",    # Cleanup operations
+        "setup": "[SETUP]",      # Configuration/setup
+        "generation": "[GEN]",   # Generation process
+        "dit": "[DIT]",          # Model loading/operations
+        "blockswap": "[SWAP]",   # BlockSwap operations
+        "download": "[DL]",      # Download operations
+        "success": "[OK]",       # Successful completion
+        "warning": "[WARN]",     # Warnings
+        "error": "[ERR]",        # Errors
+        "info": "[INFO]",        # Statistics/info
+        "tip": "[TIP]",          # Tip/suggestion
+        "video": "[VID]",        # Video/sequence info
+        "reuse": "[REUSE]",      # Reusing/recycling
+        "runner": "[RUN]",       # Runner operations
+        "vae": "[VAE]",          # VAE operations
+        "precision": "[PREC]",   # Precision
+        "device": "[DEV]",       # Device info
+        "file": "[FILE]",        # File operations
+        "alpha": "[ALPHA]",      # Alpha operations
+        "starlove": "[*]",       # Star + love
+        "dialogue": "[>]",       # Dialogue
+        "none": "",
     }
     
     def __init__(self, enabled: bool = False, show_timestamps: bool = True):
@@ -141,12 +141,12 @@ class Debug:
         
         print(f"{prefix} {indent}{message}", flush=True)
 
-    def print_header(self, cli: bool = False) -> None:
+    def print_header(self) -> None:
         """Print the header with banner - always displayed"""
         # Temporarily disable timestamps for clean header display
         original_timestamps = self.show_timestamps
         self.show_timestamps = False
-        
+
         # ASCII art logo
         self.log("", category="none", force=True)
         self.log("", category="none", force=True)
@@ -158,24 +158,21 @@ class Debug:
         self.log("╚══════╝╚══════╝╚══════╝╚═════╝   ╚═══╝  ╚═╝  ╚═╝    ╚══════╝  ╚═╝ ╚══════╝", category="none", force=True, indent_level=1)
         # Version and credits - left/right aligned to logo width
         version_text = f"v{__version__}"
-        cli_indicator = "💻 CLI · " if cli else ""
-        left_part = f"{cli_indicator}{version_text}"
         right_part = "© ByteDance Seed · NumZ · AInVFX"
         logo_width = 75
-        emoji_compensation = 1 if cli else 0
-        padding = logo_width - len(left_part) - len(right_part) - emoji_compensation
-        self.log(f"{left_part}{' ' * max(1, padding)}{right_part}", category="none", force=True, indent_level=1)
+        padding = logo_width - len(version_text) - len(right_part)
+        self.log(f"{version_text}{' ' * max(1, padding)}{right_part}", category="none", force=True, indent_level=1)
         self.log("━" * logo_width, category="none", force=True, indent_level=1)
         self.log("", category="none", force=True)
-        
+
         # Restore timestamps setting
         self.show_timestamps = original_timestamps
-        
+
         # Environment info - only in debug mode
         if self.enabled:
-            self._print_environment_info(cli)
+            self._print_environment_info()
 
-    def _print_environment_info(self, cli: bool = False) -> None:
+    def _print_environment_info(self) -> None:
         """Print concise environment info for bug reports - zero cost when debug disabled"""
         import platform
         import sys
@@ -226,27 +223,21 @@ class Debug:
                 fa_parts.append("3")
             if FLASH_ATTN_2_AVAILABLE:
                 fa_parts.append("2")
-            flash_str = f"v{','.join(fa_parts)} ✓" if fa_parts else "✗"
+            flash_str = f"v{','.join(fa_parts)} [Y]" if fa_parts else "[N]"
             
             sa_parts = []
             if SAGE_ATTN_3_AVAILABLE:
                 sa_parts.append("3")
             if SAGE_ATTN_2_AVAILABLE:
                 sa_parts.append("2")
-            sage_str = f"v{','.join(sa_parts)} ✓" if sa_parts else "✗"
-            
-            triton_str = "✓" if TRITON_AVAILABLE else "✗"
+            sage_str = f"v{','.join(sa_parts)} [Y]" if sa_parts else "[N]"
+
+            triton_str = "[Y]" if TRITON_AVAILABLE else "[N]"
         except ImportError:
             flash_str = sage_str = triton_str = "?"
         
-        # ComfyUI version
+        # Standalone mode - ComfyUI version check removed
         comfy_str = None
-        if not cli:
-            try:
-                from comfyui_version import __version__ as comfy_ver
-                comfy_str = comfy_ver
-            except ImportError:
-                pass
         
         # Print
         self.log(f"OS: {os_str} | GPU: {gpu_str}", category="info")

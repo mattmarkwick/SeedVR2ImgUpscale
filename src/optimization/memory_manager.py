@@ -15,7 +15,7 @@ from typing import Tuple, Dict, Any, Optional, List, Union
 
 
 def _device_str(device: Union[torch.device, str]) -> str:
-    """Normalized uppercase device string for comparison and logging. MPS variants → 'MPS'."""
+    """Normalized uppercase device string for comparison and logging. MPS variants -> 'MPS'."""
     s = str(device).upper()
     return 'MPS' if s.startswith('MPS') else s
 
@@ -133,9 +133,9 @@ def get_basic_vram_info(device: Optional[torch.device] = None) -> Dict[str, Any]
 vram_info = get_basic_vram_info(device=None)
 if "error" not in vram_info:
     backend = "MPS" if is_mps_available() else "CUDA"
-    print(f"📊 Initial {backend} memory: {vram_info['free_gb']:.2f}GB free / {vram_info['total_gb']:.2f}GB total")
+    print(f"Initial {backend} memory: {vram_info['free_gb']:.2f}GB free / {vram_info['total_gb']:.2f}GB total")
 else:
-    print(f"⚠️ Memory check failed: {vram_info['error']} - No available backend!")
+    print(f"[WARN] Memory check failed: {vram_info['error']} - No available backend!")
 
 
 def get_vram_usage(device: Optional[torch.device] = None, debug: Optional['Debug'] = None) -> Tuple[float, float, float, float]:
@@ -387,7 +387,8 @@ def retry_on_oom(func, *args, debug=None, operation_name="operation", **kwargs):
         clear_memory(debug=debug, deep=True, force=True, timer_name=operation_name)
         # Let memory settle
         time.sleep(0.5)
-        debug.log_memory_state("After memory clearing", show_tensors=False, detailed_tensors=False)
+        if debug:
+            debug.log_memory_state("After memory clearing", show_tensors=False, detailed_tensors=False)
         
         # Single retry
         try:
@@ -594,7 +595,7 @@ def manage_tensor(
     """
     Unified tensor management for device movement and dtype conversion.
     
-    Handles both device transfers (CPU ↔ GPU) and dtype conversions (e.g., float16 → bfloat16)
+    Handles both device transfers (CPU <-> GPU) and dtype conversions (e.g., float16 -> bfloat16)
     with intelligent early-exit optimization and comprehensive logging.
     
     Args:
@@ -647,7 +648,7 @@ def manage_tensor(
         
         dtype_info = ""
         if needs_dtype_change:
-            dtype_info = f", {current_dtype} → {target_dtype}"
+            dtype_info = f", {current_dtype} -> {target_dtype}"
         
         debug.log(
             f"Moving {tensor_name} from {current_device_str} to {target_device_str}{dtype_info} ({reason})",

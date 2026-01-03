@@ -879,7 +879,7 @@ def _load_gguf_weights(model: torch.nn.Module, state: Dict[str, torch.Tensor],
             if quant_types:
                 qtypes_str = ', '.join([f"{qtype}:{count}" for qtype, count in quant_types.items()])
                 debug.log(
-                    f"GGUF precision path: {qtypes_str} → FP16 (preserve) → BF16/FP32 (compute)", 
+                    f"GGUF precision path: {qtypes_str} -> FP16 (preserve) -> BF16/FP32 (compute)", 
                     category="precision"
                 )
             else:

@@ -320,7 +320,7 @@ def _update_model_config(
                 elif config_name == 'attention_mode':
                     display_name = 'Attention Mode'
                     
-                config_changes.append(f"{display_name}: {old_desc} → {new_desc}")
+                config_changes.append(f"{display_name}: {old_desc} -> {new_desc}")
     
     # If nothing changed, reuse model as-is
     if not any(changes_detected.values()):
@@ -602,7 +602,7 @@ def _initialize_cache_context(
             else:
                 # Model changed - remove stale cache and log the change
                 if cached_model_name:
-                    debug.log(f"DiT model changed in cache ({cached_model_name} → {dit_model}), "
+                    debug.log(f"DiT model changed in cache ({cached_model_name} -> {dit_model}), "
                              f"removing stale cached model", category="cache", force=True)
                 global_cache.remove_dit({'node_id': dit_id}, debug)
     else:
@@ -621,7 +621,7 @@ def _initialize_cache_context(
             else:
                 # Model changed - remove stale cache and log the change
                 if cached_model_name:
-                    debug.log(f"VAE model changed in cache ({cached_model_name} → {vae_model}), "
+                    debug.log(f"VAE model changed in cache ({cached_model_name} -> {vae_model}), "
                              f"removing stale cached model", category="cache", force=True)
                 global_cache.remove_vae({'node_id': vae_id}, debug)
     else:
@@ -698,8 +698,8 @@ def _create_new_runner(
     
     Args:
         dit_model: DiT model filename (determines config selection)
-                  - Contains "7b" → loads configs_7b/main.yaml
-                  - Otherwise → loads configs_3b/main.yaml
+                  - Contains "7b" -> loads configs_7b/main.yaml
+                  - Otherwise -> loads configs_3b/main.yaml
         vae_model: VAE model filename (stored for reference, not used in config selection)
         base_cache_dir: Base directory for model files (not used directly but passed for context)
         debug: Debug instance for logging and timing
@@ -1021,7 +1021,7 @@ def _setup_dit_model(
     current_dit_name = getattr(runner, '_dit_model_name', None)
     if current_dit_name and current_dit_name != dit_model:
         if hasattr(runner, 'dit') and runner.dit is not None:
-            debug.log(f"DiT model changed ({current_dit_name} → {dit_model}), cleaning old model", 
+            debug.log(f"DiT model changed ({current_dit_name} -> {dit_model}), cleaning old model", 
                      category="cache", force=True)
             cleanup_dit(runner=runner, debug=debug, cache_model=False)
     
@@ -1094,7 +1094,7 @@ def _setup_vae_model(
     current_vae_name = getattr(runner, '_vae_model_name', None)
     if current_vae_name and current_vae_name != vae_model:
         if hasattr(runner, 'vae') and runner.vae is not None:
-            debug.log(f"VAE model changed ({current_vae_name} → {vae_model}), cleaning old model", 
+            debug.log(f"VAE model changed ({current_vae_name} -> {vae_model}), cleaning old model", 
                      category="cache", force=True)
             cleanup_vae(runner=runner, debug=debug, cache_model=False)
     
