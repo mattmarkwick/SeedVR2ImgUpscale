@@ -39,3 +39,6 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["seedvr2*", "src*", "configs*"]
+
+[tool.setuptools.package-data]
+seedvr2 = ["*.pt"]

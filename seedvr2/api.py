@@ -661,7 +661,7 @@ class SeedVR2Upscaler:
         batch_size = 1
 
         # Get package directory (where pos_emb.pt and neg_emb.pt are stored)
-        package_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        package_dir = os.path.dirname(os.path.abspath(__file__))
         pos_emb_path = os.path.join(package_dir, 'pos_emb.pt')
 
         # Load and prepare text embeddings (matching production pipeline)
